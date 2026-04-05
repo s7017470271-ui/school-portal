@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة ملفات المدرسة</title>
+<style>
+  :root{
+    --bg:#f3f7fb;
+    --card:#ffffff;
+    --line:#d9e2ec;
+    --text:#1f2937;
+    --muted:#64748b;
+    --primary:#0f766e;
+    --primary-dark:#0b5f58;
+    --soft:#ecfeff;
+    --soft-2:#f8fbff;
+    --danger:#b91c1c;
+    --warning:#c2410c;
+    --shadow:0 10px 28px rgba(15,23,42,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Tahoma,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  button,input,select,textarea{font-family:inherit}
+  button{
+    border:none;
+    border-radius:12px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .top{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:linear-gradient(135deg,var(--primary),#164e63);
+    color:#fff;
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,.12);
+  }
+  .top-right,.top-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .top-title{font-size:22px;font-weight:700;line-height:1.3}
+  .btn-white{background:#fff;color:var(--primary-dark);font-weight:700}
+  .btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.18)}
+  .btn-soft{background:var(--soft);color:var(--primary-dark);font-weight:700}
+  .btn-muted{background:#eef2f7;color:#334155}
+  .btn-danger{background:#fee2e2;color:var(--danger)}
+  .btn-warning{background:#fff7ed;color:var(--warning)}
+  .icon-btn{min-width:42px;padding:10px 12px;font-size:18px;line-height:1}
+  .menu-btn{display:none}
+  .page{padding:10px}
+  .layout{
+    display:grid;
+    grid-template-columns:310px minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+  }
+  .sidebar{padding:10px;position:sticky;top:74px}
+  .viewer{padding:10px;min-width:0}
+  .search{
+    width:100%;padding:10px 12px;border:1px solid var(--line);
+    border-radius:12px;font-size:14px;margin-bottom:10px;background:#fff
+  }
+  .tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .mini{background:#eef2f7;color:#334155;padding:8px 10px;border-radius:10px;font-size:13px}
+  .category{border:1px solid var(--line);border-radius:14px;margin-bottom:8px;overflow:hidden;background:#fff}
+  .header{
+    padding:12px;cursor:pointer;background:var(--soft-2);
+    display:flex;justify-content:space-between;align-items:center;gap:10px
+  }
+  .header.open{background:var(--soft);color:var(--primary-dark)}
+  .count{background:#eef2ff;color:#4338ca;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:700}
+  .children{display:none;padding:8px;background:#fbfdff;border-top:1px solid var(--line)}
+  .children.show{display:block}
+  .item{
+    padding:10px;border:1px solid #e8edf3;border-radius:12px;margin-bottom:6px;
+    cursor:pointer;background:#fff;transition:.15s ease;
+  }
+  .item:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,23,42,.05)}
+  .item.active{background:#dff8fb;border-color:#99e3ea}
+  .item-title{font-weight:700}
+  .item small{display:block;color:var(--muted);margin-top:4px;line-height:1.7}
+  .viewer-head{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+    border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px;flex-wrap:wrap
+  }
+  .viewer-head h2{margin:0;font-size:22px}
+  .viewer-head p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+  .viewer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .action-btn{background:#eef2f7;color:#1f2937}
+  .action-btn.primary{background:var(--soft);color:var(--primary-dark);font-weight:700}
+  iframe{width:100%;height:76vh;min-height:520px;border:none;border-radius:12px;background:#fff}
+  .blank{
+    height:76vh;min-height:520px;border:2px dashed var(--line);border-radius:14px;
+    display:grid;place-items:center;color:var(--muted);background:#fbfdff;text-align:center;padding:20px;line-height:2
+  }
+  .tag{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:12px;font-weight:700}
+  .tag.hidden{background:#fff7ed;color:#c2410c}
+  .muted{color:var(--muted)}
+  .hidden{display:none !important}
+
+  .admin{display:none;margin-bottom:12px;padding:10px}
+  .admin.show{display:block}
+  .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .panel{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fbfdff}
+  .panel h3{margin:0 0 10px;font-size:17px}
+  .field{margin-bottom:9px}
+  .field label{display:block;font-size:13px;font-weight:700;margin-bottom:5px}
+  .field input,.field textarea,.field select{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:14px;background:#fff
+  }
+  .field textarea{min-height:92px;resize:vertical}
+  .row{display:flex;gap:6px;flex-wrap:wrap}
+  .admin-list{max-height:370px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+  .admin-item{
+    border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff;
+    display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center
+  }
+  .note{font-size:13px;color:#64748b;line-height:1.9;margin-bottom:10px}
+  .status-bar{
+    margin-bottom:10px;padding:10px 12px;border-radius:12px;background:#f8fafc;border:1px solid var(--line);
+    color:#334155;font-size:13px;line-height:1.8
+  }
+
+  .overlay{
+    position:fixed;inset:0;background:rgba(2,6,23,.35);z-index:60;opacity:0;pointer-events:none;transition:.2s ease
+  }
+  .overlay.show{opacity:1;pointer-events:auto}
+
+  .modal-wrap{
+    position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;z-index:80;padding:16px
+  }
+  .modal-wrap.show{display:flex}
+  .modal{
+    width:min(460px,100%);background:#fff;border-radius:18px;border:1px solid var(--line);box-shadow:0 18px 50px rgba(15,23,42,.2);padding:16px
+  }
+  .modal h3{margin:0 0 10px}
+  .modal .actions{display:flex;gap:8px;justify-content:flex-start;flex-wrap:wrap;margin-top:8px}
+  .close-x{background:#eef2f7;color:#334155}
+
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr}
+    .admin-grid{grid-template-columns:1fr}
+    .menu-btn{display:inline-flex}
+    .top{padding:10px 12px}
+    .top-title{font-size:18px;max-width:62vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .top-left{gap:6px}
+    .sidebar{
+      position:fixed;top:64px;right:0;bottom:0;width:min(90vw,360px);z-index:70;
+      transform:translateX(105%);transition:.2s ease;overflow:auto;border-radius:18px 0 0 0;box-shadow:0 20px 50px rgba(2,6,23,.22)
+    }
+    .sidebar.open{transform:translateX(0)}
+    .tools,.desktop-only{display:none !important}
+    .viewer{padding:10px}
+    iframe,.blank{height:calc(100vh - 190px);min-height:420px}
+    .viewer-actions{gap:6px}
+    .viewer-actions button{padding:9px 11px;font-size:13px}
+  }
+
+  @media (max-width:520px){
+    .top-right,.top-left{gap:6px}
+    .btn-white,.btn-ghost{padding:9px 11px;font-size:13px}
+    .viewer-head h2{font-size:19px}
+    .viewer-head p{font-size:12px}
+    .blank{padding:16px;line-height:1.9}
+    .admin-item{grid-template-columns:1fr}
+  }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-right">
+    <button class="btn-ghost icon-btn menu-btn" id="menuBtn" title="القائمة">☰</button>
+    <div class="top-title" id="siteTitleTop">بوابة ملفات المدرسة</div>
+  </div>
+  <div class="top-left">
+    <button class="btn-ghost hidden" id="toggleAdminBtn">إظهار الإدارة</button>
+    <button class="btn-ghost hidden desktop-only" id="resetBtn">إعادة ضبط</button>
+    <button class="btn-white" id="loginBtn">دخول الإدارة</button>
+    <button class="btn-ghost hidden" id="logoutBtn">خروج الإدارة</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="admin card" id="adminArea">
+    <div class="status-bar" id="statusBar">جاري تحميل البيانات...</div>
+    <div class="note">
+      هذه النسخة تحفظ الأقسام والملفات في Firebase. الزائر يعاين فقط، والمدير وحده يستطيع الإضافة والتعديل والحذف والحفظ الاحتياطي.
+    </div>
+    <div class="admin-grid">
+      <div class="panel">
+        <h3>إعدادات الموقع</h3>
+        <div class="field">
+          <label>عنوان الموقع</label>
+          <input id="siteTitleInput" placeholder="بوابة ملفات المدرسة">
+        </div>
+        <div class="row">
+          <button class="btn-soft" id="saveSettingsBtn">حفظ العنوان</button>
+          <button class="btn-muted" id="exportJsonBtn">حفظ نسخة JSON</button>
+          <button class="btn-warning" id="importJsonBtn">استعادة JSON</button>
+          <input type="file" id="jsonFileInput" accept="application/json" class="hidden">
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>إضافة قسم</h3>
+        <div class="field">
+          <label>اسم القسم</label>
+          <input id="categoryNameInput" placeholder="مثال: الخطط العامة">
+        </div>
+        <button class="btn-soft" id="addCategoryBtn">إضافة القسم</button>
+      </div>
+
+      <div class="panel">
+        <h3>إضافة رابط أو ملف</h3>
+        <div class="field">
+          <label>عنوان العنصر</label>
+          <input id="itemTitleInput" placeholder="مثال: الخطة التشغيلية">
+        </div>
+        <div class="field">
+          <label>الرابط</label>
+          <input id="itemUrlInput" placeholder="الصق رابط Google Drive أو OneDrive أو أي رابط آخر">
+        </div>
+        <div class="field">
+          <label>القسم</label>
+          <select id="itemCategorySelect"></select>
+        </div>
+        <div class="field">
+          <label>ملاحظة بسيطة</label>
+          <input id="itemNoteInput" placeholder="اختياري">
+        </div>
+        <div class="field">
+          <label><input type="checkbox" id="itemHiddenInput"> إخفاء العنصر عن الزوار</label>
+        </div>
+        <button class="btn-soft" id="addItemBtn">إضافة العنصر</button>
+      </div>
+
+      <div class="panel">
+        <h3>إدارة الأقسام والعناصر</h3>
+        <div class="admin-list" id="adminList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar card" id="sidebar">
+      <input class="search" id="searchInput" placeholder="ابحث عن قسم أو ملف...">
+      <div class="tools">
+        <button class="mini" id="expandAllBtn">فتح الجميع</button>
+        <button class="mini" id="collapseAllBtn">طي الجميع</button>
+      </div>
+      <div id="categories"></div>
+    </div>
+
+    <div class="viewer card">
+      <div class="viewer-head">
+        <div>
+          <h2 id="viewerTitle">مرحبًا بك</h2>
+          <p id="viewerMeta">اختر قسمًا ثم اختر الملف المطلوب.</p>
+        </div>
+        <div>
+          <span class="tag" id="viewerType">معاينة</span>
+        </div>
+      </div>
+
+      <div class="viewer-actions">
+        <button class="action-btn" id="openNewBtn">فتح في نافذة جديدة</button>
+        <button class="action-btn" id="downloadBtn">تنزيل</button>
+        <button class="action-btn" id="copyLinkBtn">نسخ الرابط</button>
+        <button class="action-btn primary" id="whatsBtn">مشاركة واتساب</button>
+        <button class="action-btn" id="shareSectionBtn">مشاركة القسم</button>
+      </div>
+
+      <div id="viewerArea">
+        <div class="blank">ابدأ باختيار قسم، ثم اختر عنصرًا من تحته ليظهر هنا بالحجم الكامل داخل الصفحة.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="modal-wrap" id="loginModalWrap">
+  <div class="modal">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3>دخول الإدارة</h3>
+      <button class="close-x" id="closeLoginModalBtn">إغلاق</button>
+    </div>
+    <div class="field">
+      <label>البريد الإلكتروني</label>
+      <input id="loginEmail" type="email" placeholder="example@email.com">
+    </div>
+    <div class="field">
+      <label>كلمة المرور</label>
+      <input id="loginPassword" type="password" placeholder="********">
+    </div>
+    <div class="actions">
+      <button class="btn-soft" id="submitLoginBtn">دخول</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDYzQA4llGyzx3KybpZkIUDBD9jUzXO_Mc",
+  authDomain: "school-portal-4412e.firebaseapp.com",
+  projectId: "school-portal-4412e",
+  storageBucket: "school-portal-4412e.firebasestorage.app",
+  messagingSenderId: "251172184049",
+  appId: "1:251172184049:web:6d8186e38e22352c9cae50"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const FALLBACK_STORAGE_KEY = "school_portal_fallback_v1";
+let unsubscribeCategories = null;
+let unsubscribeItems = null;
+let unsubscribeSettings = null;
+
+let state = {
+  isAdmin:false,
+  adminVisible:true,
+  mobileSidebarOpen:false,
+  loading:true,
+  search:"",
+  openCategories:[],
+  selectedItemId:null,
+  siteTitle:"بوابة ملفات المدرسة",
+  categories:[],
+  items:[]
+};
+
+function q(id){ return document.getElementById(id); }
+function isMobile(){ return window.innerWidth <= 900; }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function escapeHtml(v){ return String(v ?? "").replace(/[&<>\"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
+function categoryName(id){ const c = state.categories.find(x=>x.id===id); return c ? c.name : "بدون قسم"; }
+function currentItem(){ return state.items.find(x=>x.id===state.selectedItemId) || null; }
+function canUseItem(item){ return item && (state.isAdmin || !item.hidden); }
+
+function setStatus(text){
+  const bar = q('statusBar');
+  if(bar) bar.textContent = text;
+}
+
+function saveFallback(){
+  localStorage.setItem(FALLBACK_STORAGE_KEY, JSON.stringify({
+    siteTitle: state.siteTitle,
+    categories: state.categories,
+    items: state.items
+  }));
+}
+
+function loadFallback(){
+  const raw = localStorage.getItem(FALLBACK_STORAGE_KEY);
+  if(!raw) return null;
+  try { return JSON.parse(raw); } catch(e){ return null; }
+}
+
+function defaultSeed(){
+  const c1 = {id:uid(), name:"الخطط العامة", order:1};
+  const c2 = {id:uid(), name:"روابط مهمة", order:2};
+  return {
+    siteTitle:"بوابة ملفات المدرسة",
+    categories:[c1,c2],
+    items:[
+      {id:uid(), title:"موقع وزارة التعليم", url:"https://www.moe.gov.sa", categoryId:c2.id, note:"مثال", hidden:false, order:1},
+      {id:uid(), title:"خطة تشغيلية تجريبية", url:"https://drive.google.com/file/d/1abcDEFexample12345/view?usp=sharing", categoryId:c1.id, note:"رابط تجريبي", hidden:false, order:2}
+    ]
+  };
+}
+
+function normalizeData(data){
+  const seed = defaultSeed();
+  const siteTitle = (data && data.siteTitle) ? data.siteTitle : seed.siteTitle;
+  const categories = Array.isArray(data?.categories) && data.categories.length ? data.categories.map((c,i)=>(
+    {id:c.id || uid(), name:c.name || `قسم ${i+1}`, order:Number.isFinite(c.order)?c.order:(i+1)}
+  )) : seed.categories;
+  const items = Array.isArray(data?.items) ? data.items.map((it,i)=>(
+    {id:it.id || uid(), title:it.title || `عنصر ${i+1}`, url:it.url || "", categoryId:it.categoryId || categories[0]?.id || "", note:it.note || "", hidden:!!it.hidden, order:Number.isFinite(it.order)?it.order:(i+1)}
+  )) : seed.items;
+  return {siteTitle, categories, items};
+}
+
+function googlePreviewUrl(url){
+  try{
+    const u = new URL(url);
+    if(u.hostname.includes('drive.google.com')){
+      const m1 = url.match(/\/file\/d\/([^/]+)/);
+      const m2 = url.match(/[?&]id=([^&]+)/);
+      const id = (m1 && m1[1]) || (m2 && m2[1]);
+      if(id) return `https://drive.google.com/file/d/${id}/preview`;
+    }
+    if(u.hostname.includes('docs.google.com')) return url.replace('/edit','/preview');
+    if(u.hostname.includes('1drv.ms') || u.hostname.includes('onedrive.live.com')) return url;
+  }catch(e){}
+  return url;
+}
+
+function getTypeLabel(url){
+  const lower = (url || '').toLowerCase();
+  if(lower.includes('drive.google.com')) return 'Google Drive';
+  if(lower.includes('onedrive') || lower.includes('1drv.ms')) return 'OneDrive';
+  if(lower.endsWith('.pdf')) return 'PDF';
+  if(lower.endsWith('.html') || lower.endsWith('.htm')) return 'HTML';
+  return 'رابط';
+}
+
+function closeSidebar(){
+  state.mobileSidebarOpen = false;
+  q('sidebar').classList.remove('open');
+  q('overlay').classList.remove('show');
+}
+function openSidebar(){
+  state.mobileSidebarOpen = true;
+  q('sidebar').classList.add('open');
+  q('overlay').classList.add('show');
+}
+function toggleSidebar(){
+  if(state.mobileSidebarOpen) closeSidebar(); else openSidebar();
+}
+
+function renderTop(){
+  q('siteTitleTop').textContent = state.siteTitle;
+  q('loginBtn').classList.toggle('hidden', state.isAdmin);
+  q('logoutBtn').classList.toggle('hidden', !state.isAdmin);
+  q('toggleAdminBtn').classList.toggle('hidden', !state.isAdmin);
+  q('resetBtn').classList.toggle('hidden', !state.isAdmin);
+  q('toggleAdminBtn').textContent = state.adminVisible ? 'إخفاء الإدارة' : 'إظهار الإدارة';
+  q('adminArea').classList.toggle('show', state.isAdmin && state.adminVisible);
+  q('siteTitleInput').value = state.siteTitle;
+  fillCategorySelect();
+}
+
+function filteredItems(catId){
+  let arr = state.items.filter(x => state.isAdmin || !x.hidden);
+  if(catId) arr = arr.filter(x => x.categoryId === catId);
+  const s = state.search.trim().toLowerCase();
+  if(s){
+    arr = arr.filter(x =>
+      (x.title||'').toLowerCase().includes(s) ||
+      (x.note||'').toLowerCase().includes(s) ||
+      (categoryName(x.categoryId)||'').toLowerCase().includes(s)
+    );
+  }
+  return arr.sort((a,b)=>(a.order||0)-(b.order||0) || (a.title||'').localeCompare(b.title||'', 'ar'));
+}
+
+function renderCategories(){
+  const host = q('categories');
+  host.innerHTML = '';
+  const cats = [...state.categories].sort((a,b)=>(a.order||0)-(b.order||0) || (a.name||'').localeCompare(b.name||'', 'ar'));
+
+  cats.forEach(cat=>{
+    const items = filteredItems(cat.id);
+    const open = state.openCategories.includes(cat.id);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'category';
+
+    const head = document.createElement('div');
+    head.className = 'header' + (open ? ' open' : '');
+    head.innerHTML = `<strong>${escapeHtml(cat.name)}</strong><div style="display:flex;align-items:center;gap:8px"><span class="count">${items.length}</span><span>${open ? '⌃' : '⌄'}</span></div>`;
+    head.onclick = ()=>{
+      if(open) state.openCategories = state.openCategories.filter(x=>x!==cat.id);
+      else state.openCategories.push(cat.id);
+      renderCategories();
+    };
+
+    const children = document.createElement('div');
+    children.className = 'children' + (open ? ' show' : '');
+
+    if(items.length){
+      items.forEach(item=>{
+        const div = document.createElement('div');
+        div.className = 'item' + (state.selectedItemId===item.id ? ' active' : '');
+        div.innerHTML = `<div class="item-title">${escapeHtml(item.title)}</div><small>${escapeHtml(item.note || '')}</small>`;
+        div.onclick = ()=>showItem(item.id);
+        children.appendChild(div);
+      });
+    }else{
+      const empty = document.createElement('div');
+      empty.className = 'item';
+      empty.style.cursor = 'default';
+      empty.textContent = 'لا توجد عناصر';
+      children.appendChild(empty);
+    }
+
+    wrap.appendChild(head);
+    wrap.appendChild(children);
+    host.appendChild(wrap);
+  });
+}
+
+function clearViewer(){
+  state.selectedItemId = null;
+  q('viewerTitle').textContent = 'مرحبًا بك';
+  q('viewerMeta').textContent = 'اختر قسمًا ثم اختر الملف المطلوب.';
+  q('viewerType').textContent = 'معاينة';
+  q('viewerArea').innerHTML = `<div class="blank">ابدأ باختيار قسم، ثم اختر عنصرًا من تحته ليظهر هنا بالحجم الكامل داخل الصفحة.</div>`;
+}
+
+function showItem(id){
+  const item = state.items.find(x=>x.id===id);
+  if(!canUseItem(item)) return;
+  state.selectedItemId = id;
+  q('viewerTitle').textContent = item.title;
+  q('viewerMeta').textContent = `${categoryName(item.categoryId)}${item.note ? ' · ' + item.note : ''}`;
+  q('viewerType').textContent = getTypeLabel(item.url);
+  q('viewerArea').innerHTML = `<iframe src="${escapeHtml(googlePreviewUrl(item.url))}" referrerpolicy="no-referrer"></iframe>`;
+  renderCategories();
+  if(isMobile()) closeSidebar();
+}
+
+function updateActionButtons(){
+  const has = !!currentItem();
+  ['openNewBtn','downloadBtn','copyLinkBtn','whatsBtn','shareSectionBtn'].forEach(id=> q(id).disabled = !has);
+}
+
+function fillCategorySelect(){
+  const cats = [...state.categories].sort((a,b)=>(a.order||0)-(b.order||0));
+  q('itemCategorySelect').innerHTML = cats.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+}
+
+function renderAdminList(){
+  const host = q('adminList');
+  host.innerHTML = '';
+
+  const cats = [...state.categories].sort((a,b)=>(a.order||0)-(b.order||0));
+  cats.forEach(cat=>{
+    const row = document.createElement('div');
+    row.className = 'admin-item';
+    row.innerHTML = `<div><b>قسم: ${escapeHtml(cat.name)}</b><small>عدد العناصر: ${state.items.filter(x=>x.categoryId===cat.id).length}</small></div>
+      <div class="row">
+        <button class="btn-muted">تعديل</button>
+        <button class="btn-danger">حذف</button>
+      </div>`;
+    const [editBtn, delBtn] = row.querySelectorAll('button');
+
+    editBtn.onclick = async ()=>{
+      const name = prompt('اسم القسم الجديد', cat.name);
+      if(!name || !name.trim()) return;
+      try{ await db.collection('categories').doc(cat.id).set({...cat, name:name.trim()}, {merge:true}); }catch(err){ console.error(err); alert('تعذر تعديل القسم.'); }
+    };
+
+    delBtn.onclick = async ()=>{
+      if(!confirm('سيتم حذف القسم ونقل ملفاته إلى أول قسم موجود. متابعة؟')) return;
+      const remaining = cats.filter(x=>x.id!==cat.id);
+      const fallback = remaining[0]?.id || '';
+      const batch = db.batch();
+      state.items.filter(it=>it.categoryId===cat.id).forEach(it=>{
+        batch.set(db.collection('items').doc(it.id), {categoryId:fallback}, {merge:true});
+      });
+      batch.delete(db.collection('categories').doc(cat.id));
+      try{ await batch.commit(); }catch(err){ console.error(err); alert('تعذر حذف القسم.'); }
+      state.openCategories = state.openCategories.filter(x=>x!==cat.id);
+    };
+    host.appendChild(row);
+  });
+
+  const items = [...state.items].sort((a,b)=>(a.order||0)-(b.order||0));
+  items.forEach(item=>{
+    const row = document.createElement('div');
+    row.className = 'admin-item';
+    row.innerHTML = `<div>
+      <b>${escapeHtml(item.title)}</b>
+      <small>${escapeHtml(categoryName(item.categoryId))}${item.note ? ' · ' + escapeHtml(item.note) : ''}</small>
+      <div style="margin-top:5px"><span class="tag ${item.hidden ? 'hidden':''}">${item.hidden ? 'مخفي' : 'ظاهر'}</span></div>
+      </div>
+      <div class="row">
+        <button class="btn-muted">تعديل</button>
+        <button class="btn-muted">${item.hidden ? 'إظهار' : 'إخفاء'}</button>
+        <button class="btn-danger">حذف</button>
+      </div>`;
+
+    const [editBtn, toggleBtn, delBtn] = row.querySelectorAll('button');
+
+    editBtn.onclick = async ()=>{
+      const title = prompt('عنوان العنصر', item.title);
+      if(!title || !title.trim()) return;
+      const url = prompt('الرابط', item.url) || item.url;
+      const note = prompt('الملاحظة', item.note || '') || '';
+      const options = state.categories.map((c,i)=>`${i+1}: ${c.name}`).join('\n');
+      const picked = prompt('اختر رقم القسم:\n'+options, String(state.categories.findIndex(c=>c.id===item.categoryId)+1));
+      let categoryId = item.categoryId;
+      const idx = Number(picked)-1;
+      if(!Number.isNaN(idx) && state.categories[idx]) categoryId = state.categories[idx].id;
+      try{ await db.collection('items').doc(item.id).set({
+        ...item,
+        title:title.trim(),
+        url:url.trim(),
+        note:note.trim(),
+        categoryId
+      }, {merge:true}); }catch(err){ console.error(err); alert('تعذر تعديل العنصر.'); }
+    };
+
+    toggleBtn.onclick = async ()=>{
+      try{
+        await db.collection('items').doc(item.id).set({hidden:!item.hidden}, {merge:true});
+      }catch(err){
+        console.error(err);
+        alert('تعذر تغيير حالة الإخفاء.');
+      }
+    };
+
+    delBtn.onclick = async ()=>{
+      if(!confirm('حذف العنصر؟')) return;
+      try{ await db.collection('items').doc(item.id).delete();
+      if(state.selectedItemId === item.id) clearViewer(); }catch(err){ console.error(err); alert('تعذر حذف العنصر.'); }
+    };
+
+    host.appendChild(row);
+  });
+}
+
+function renderAll(){
+  renderTop();
+  renderCategories();
+  renderAdminList();
+  updateActionButtons();
+  const item = currentItem();
+  if(item && !canUseItem(item)) clearViewer();
+}
+
+async function ensureSeedIfEmpty(){
+  if(!auth.currentUser) return;
+  const catsSnap = await db.collection('categories').limit(1).get();
+  const itemsSnap = await db.collection('items').limit(1).get();
+  const settingsSnap = await db.collection('settings').doc('site').get();
+  if(!catsSnap.empty || !itemsSnap.empty || settingsSnap.exists) return;
+
+  const seed = normalizeData(loadFallback() || defaultSeed());
+  const batch = db.batch();
+  batch.set(db.collection('settings').doc('site'), {siteTitle:seed.siteTitle, updatedAt:Date.now()}, {merge:true});
+  seed.categories.forEach(cat=> batch.set(db.collection('categories').doc(cat.id), cat));
+  seed.items.forEach(item=> batch.set(db.collection('items').doc(item.id), item));
+  await batch.commit();
+}
+
+function subscribeData(){
+  unsubscribeSettings?.();
+  unsubscribeCategories?.();
+  unsubscribeItems?.();
+
+  unsubscribeSettings = db.collection('settings').doc('site').onSnapshot(doc=>{
+    if(doc.exists){
+      state.siteTitle = doc.data().siteTitle || 'بوابة ملفات المدرسة';
+      saveFallback();
+      renderTop();
+    }
+  }, handleFirestoreError);
+
+  unsubscribeCategories = db.collection('categories').orderBy('order').onSnapshot(snap=>{
+    state.categories = snap.docs.map(d=> ({id:d.id, ...d.data()}));
+    if(!state.openCategories.length) state.openCategories = state.categories.map(c=>c.id);
+    saveFallback();
+    renderAll();
+  }, handleFirestoreError);
+
+  unsubscribeItems = db.collection('items').orderBy('order').onSnapshot(snap=>{
+    state.items = snap.docs.map(d=> ({id:d.id, ...d.data()}));
+    saveFallback();
+    const selected = currentItem();
+    if(selected && canUseItem(selected)) showItem(selected.id);
+    else renderAll();
+  }, handleFirestoreError);
+}
+
+function handleFirestoreError(error){
+  console.error(error);
+  const fallback = normalizeData(loadFallback() || defaultSeed());
+  state.siteTitle = fallback.siteTitle;
+  state.categories = fallback.categories;
+  state.items = fallback.items;
+  if(!state.openCategories.length) state.openCategories = state.categories.map(c=>c.id);
+  setStatus('تعذر الاتصال بـ Firebase حاليًا، وتم تشغيل النسخة المحلية المؤقتة.');
+  renderAll();
+}
+
+async function saveSettings(){
+  const title = q('siteTitleInput').value.trim();
+  if(!title) return alert('اكتب عنوان الموقع');
+  try{
+    await db.collection('settings').doc('site').set({siteTitle:title, updatedAt:Date.now()}, {merge:true});
+  }catch(err){
+    console.error(err);
+    alert('تعذر حفظ العنوان. تأكد من دخول الإدارة ومن عمل Firestore Rules.');
+  }
+}
+
+
+async function addCategory(){
+  const name = q('categoryNameInput').value.trim();
+  if(!name) return alert('اكتب اسم القسم');
+  const id = uid();
+  const order = (Math.max(0, ...state.categories.map(c=>Number(c.order)||0)) + 1);
+  try{
+    await db.collection('categories').doc(id).set({name, order});
+    state.openCategories.push(id);
+    q('categoryNameInput').value = '';
+  }catch(err){
+    console.error(err);
+    alert('تعذر إضافة القسم. تأكد من دخول الإدارة ومن عمل Firestore.');
+  }
+}
+
+async function addItem(){
+  const title = q('itemTitleInput').value.trim();
+  const url = q('itemUrlInput').value.trim();
+  const categoryId = q('itemCategorySelect').value;
+  const note = q('itemNoteInput').value.trim();
+  const hidden = q('itemHiddenInput').checked;
+  if(!title) return alert('اكتب عنوان العنصر');
+  if(!url) return alert('اكتب الرابط');
+  const id = uid();
+  const order = (Math.max(0, ...state.items.map(c=>Number(c.order)||0)) + 1);
+  try{
+    await db.collection('items').doc(id).set({title,url,categoryId,note,hidden,order});
+    if(categoryId && !state.openCategories.includes(categoryId)) state.openCategories.push(categoryId);
+    q('itemTitleInput').value = '';
+    q('itemUrlInput').value = '';
+    q('itemNoteInput').value = '';
+    q('itemHiddenInput').checked = false;
+  }catch(err){
+    console.error(err);
+    alert('تعذر إضافة العنصر. تأكد من دخول الإدارة ومن عمل Firestore.');
+  }
+}
+
+function exportJson(){
+  const data = {
+    siteTitle: state.siteTitle,
+    categories: state.categories,
+    items: state.items
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'school-portal-backup.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+
+async function importJsonFile(file){
+  if(!file) return;
+  const text = await file.text();
+  let parsed;
+  try{ parsed = JSON.parse(text); }catch(e){ alert('ملف JSON غير صالح'); return; }
+  const data = normalizeData(parsed);
+  if(!confirm('سيتم استبدال الأقسام والعناصر الحالية بمحتوى الملف. متابعة؟')) return;
+
+  const batch = db.batch();
+  batch.set(db.collection('settings').doc('site'), {siteTitle:data.siteTitle, updatedAt:Date.now()}, {merge:true});
+
+  const existingCats = await db.collection('categories').get();
+  existingCats.docs.forEach(doc=> batch.delete(doc.ref));
+  const existingItems = await db.collection('items').get();
+  existingItems.docs.forEach(doc=> batch.delete(doc.ref));
+
+  data.categories.forEach(cat=> batch.set(db.collection('categories').doc(cat.id), cat));
+  data.items.forEach(item=> batch.set(db.collection('items').doc(item.id), item));
+  try{ await batch.commit();
+  state.openCategories = data.categories.map(c=>c.id); }catch(err){ console.error(err); alert('تعذر استعادة النسخة.'); }
+}
+
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=> alert('تم نسخ الرابط')).catch(()=> alert('تعذر النسخ تلقائيًا'));
+}
+
+function openCurrentNew(){
+  const item = currentItem();
+  if(!item) return;
+  window.open(item.url, '_blank');
+}
+
+function downloadCurrent(){
+  const item = currentItem();
+  if(!item) return;
+  const a = document.createElement('a');
+  a.href = item.url;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+function copyCurrentLink(){
+  const item = currentItem();
+  if(!item) return;
+  copyText(item.url);
+}
+
+function shareWhats(){
+  const item = currentItem();
+  if(!item) return;
+  const txt = `${item.title}\n${item.url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+function shareSection(){
+  const item = currentItem();
+  if(!item) return;
+  const items = filteredItems(item.categoryId);
+  const lines = items.map((x,i)=>`${i+1}- ${x.title}\n${x.url}`);
+  const txt = `ملفات قسم: ${categoryName(item.categoryId)}\n\n${lines.join('\n\n')}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+function openLoginModal(){ q('loginModalWrap').classList.add('show'); }
+function closeLoginModal(){ q('loginModalWrap').classList.remove('show'); }
+
+async function submitLogin(){
+  const email = q('loginEmail').value.trim();
+  const password = q('loginPassword').value;
+  if(!email || !password) return alert('أدخل البريد وكلمة المرور');
+  try{
+    await auth.signInWithEmailAndPassword(email, password);
+    q('loginPassword').value = '';
+    closeLoginModal();
+  }catch(err){
+    console.error(err);
+    alert('تعذر تسجيل الدخول. تأكد من البريد وكلمة المرور وتفعيل Email/Password في Firebase.');
+  }
+}
+
+function logout(){ auth.signOut(); }
+
+async function resetLocalFallback(){
+  if(!confirm('سيتم حذف النسخة المحلية الاحتياطية فقط من هذا المتصفح. متابعة؟')) return;
+  localStorage.removeItem(FALLBACK_STORAGE_KEY);
+  alert('تم حذف النسخة المحلية الاحتياطية من هذا المتصفح.');
+}
+
+function bindEvents(){
+  q('menuBtn').onclick = toggleSidebar;
+  q('overlay').onclick = closeSidebar;
+  q('toggleAdminBtn').onclick = ()=>{ state.adminVisible = !state.adminVisible; renderTop(); };
+  q('resetBtn').onclick = resetLocalFallback;
+  q('loginBtn').onclick = openLoginModal;
+  q('logoutBtn').onclick = logout;
+  q('closeLoginModalBtn').onclick = closeLoginModal;
+  q('submitLoginBtn').onclick = submitLogin;
+
+  q('saveSettingsBtn').onclick = saveSettings;
+  q('addCategoryBtn').onclick = addCategory;
+  q('addItemBtn').onclick = addItem;
+  q('expandAllBtn').onclick = ()=>{ state.openCategories = state.categories.map(c=>c.id); renderCategories(); };
+  q('collapseAllBtn').onclick = ()=>{ state.openCategories = []; renderCategories(); };
+  q('searchInput').addEventListener('input', e=>{ state.search = e.target.value || ''; renderCategories(); });
+
+  q('exportJsonBtn').onclick = exportJson;
+  q('importJsonBtn').onclick = ()=> q('jsonFileInput').click();
+  q('jsonFileInput').addEventListener('change', async e=>{ await importJsonFile(e.target.files[0]); e.target.value = ''; });
+
+  q('openNewBtn').onclick = openCurrentNew;
+  q('downloadBtn').onclick = downloadCurrent;
+  q('copyLinkBtn').onclick = copyCurrentLink;
+  q('whatsBtn').onclick = shareWhats;
+  q('shareSectionBtn').onclick = shareSection;
+
+  window.addEventListener('resize', ()=>{
+    if(!isMobile()) closeSidebar();
+  });
+}
+
+async function boot(){
+  bindEvents();
+  updateActionButtons();
+
+  const fallback = normalizeData(loadFallback() || defaultSeed());
+  state.siteTitle = fallback.siteTitle;
+  state.categories = fallback.categories;
+  state.items = fallback.items;
+  state.openCategories = state.categories.map(c=>c.id);
+  renderAll();
+
+  try{
+    setStatus('جاري الاتصال بـ Firebase...');
+    subscribeData();
+    setStatus('تم الاتصال بـ Firebase. التعديلات تُحفَظ مباشرة.');
+  }catch(err){
+    console.error(err);
+    handleFirestoreError(err);
+  }
+
+  auth.onAuthStateChanged(async user=>{
+    state.isAdmin = !!user;
+    if(state.isAdmin){
+      setStatus('تم دخول الإدارة بنجاح. يمكنك الآن التعديل والحفظ الاحتياطي.');
+      try{ await ensureSeedIfEmpty(); }catch(err){ console.error(err); }
+    }
+    renderAll();
+  });
+}
+
+boot();
+</script>
+</body>
+</html>
