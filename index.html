@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>بوابة ملفات المدرسة</title>
+<title>ابتدائية ومتوسطة الراشدون بالمربع منصة الخطط والملفات المدرسية</title>
 <style>
   :root{
     --bg:#f3f7fb;
@@ -13,8 +13,10 @@
     --muted:#64748b;
     --primary:#0f766e;
     --primary-dark:#0b5f58;
+    --primary-2:#164e63;
     --soft:#ecfeff;
     --soft-2:#f8fbff;
+    --accent:#4338ca;
     --danger:#b91c1c;
     --warning:#c2410c;
     --shadow:0 10px 28px rgba(15,23,42,.06);
@@ -27,6 +29,24 @@
     background:var(--bg);
     color:var(--text);
   }
+
+  body.theme-emerald{
+    --bg:#f3f7fb;--card:#ffffff;--line:#d9e2ec;--text:#1f2937;--muted:#64748b;
+    --primary:#0f766e;--primary-dark:#0b5f58;--primary-2:#164e63;--soft:#ecfeff;--soft-2:#f8fbff;--accent:#4338ca;
+  }
+  body.theme-blue{
+    --bg:#f5f9ff;--card:#ffffff;--line:#d7e3f4;--text:#1e293b;--muted:#64748b;
+    --primary:#1d4ed8;--primary-dark:#1e40af;--primary-2:#0f172a;--soft:#eff6ff;--soft-2:#f8fbff;--accent:#0ea5e9;
+  }
+  body.theme-purple{
+    --bg:#faf7ff;--card:#ffffff;--line:#e7def7;--text:#312e81;--muted:#6b7280;
+    --primary:#7c3aed;--primary-dark:#6d28d9;--primary-2:#4338ca;--soft:#f3e8ff;--soft-2:#faf5ff;--accent:#ec4899;
+  }
+  body.theme-sand{
+    --bg:#fbf8f3;--card:#fffdf8;--line:#eadfce;--text:#3f3a31;--muted:#6b7280;
+    --primary:#8b5e34;--primary-dark:#6f4a28;--primary-2:#355070;--soft:#fff7ed;--soft-2:#fffaf3;--accent:#d97706;
+  }
+
   button,input,select,textarea{font-family:inherit}
   button{
     border:none;
@@ -39,24 +59,66 @@
     position:sticky;
     top:0;
     z-index:50;
-    background:linear-gradient(135deg,var(--primary),#164e63);
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
     color:#fff;
-    padding:12px 14px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
+    padding:12px 14px 14px;
     box-shadow:0 8px 24px rgba(0,0,0,.12);
   }
-  .top-right,.top-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .top-title{font-size:22px;font-weight:700;line-height:1.3}
+  .top-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .top-right{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:flex-start;
+    gap:8px;
+    text-align:right;
+  }
+  .top-left{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    flex-wrap:wrap;
+    padding-top:2px;
+  }
+  .brand-title-wrap{
+    width:100%;
+    display:flex;
+    align-items:flex-start;
+    justify-content:flex-start;
+    gap:10px;
+    min-width:0;
+  }
+  .brand-logo-top{
+    width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.24);
+    display:flex;align-items:center;justify-content:center;font-size:23px;box-shadow:inset 0 1px 0 rgba(255,255,255,.2);flex:0 0 auto
+  }
+  .top-title{font-size:22px;font-weight:700;line-height:1.35;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;max-width:100%}
+  .menu-inline{display:flex;align-items:center;justify-content:flex-start;flex:0 0 auto}
   .btn-white{background:#fff;color:var(--primary-dark);font-weight:700}
   .btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.18)}
+  .admin-icon-btn{
+    width:38px;
+    height:38px;
+    padding:0;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+  }
   .btn-soft{background:var(--soft);color:var(--primary-dark);font-weight:700}
   .btn-muted{background:#eef2f7;color:#334155}
   .btn-danger{background:#fee2e2;color:var(--danger)}
   .btn-warning{background:#fff7ed;color:var(--warning)}
-  .icon-btn{min-width:42px;padding:10px 12px;font-size:18px;line-height:1}
+  .icon-btn{width:48px;height:48px;min-width:48px;padding:0;font-size:22px;line-height:1;border-radius:16px;display:flex;align-items:center;justify-content:center}
   .menu-btn{display:none}
   .page{padding:10px}
   .layout{
@@ -81,19 +143,20 @@
   .mini{background:#eef2f7;color:#334155;padding:8px 10px;border-radius:10px;font-size:13px}
   .category{border:1px solid var(--line);border-radius:14px;margin-bottom:8px;overflow:hidden;background:#fff}
   .header{
-    padding:12px;cursor:pointer;background:var(--soft-2);
-    display:flex;justify-content:space-between;align-items:center;gap:10px
+    padding:12px;cursor:pointer;background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px
   }
-  .header.open{background:var(--soft);color:var(--primary-dark)}
-  .count{background:#eef2ff;color:#4338ca;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:700}
+  .header.open{background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff}
+  .count{background:rgba(255,255,255,.2);color:#fff;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:700}
   .children{display:none;padding:8px;background:#fbfdff;border-top:1px solid var(--line)}
   .children.show{display:block}
   .item{
-    padding:10px;border:1px solid #e8edf3;border-radius:12px;margin-bottom:6px;
-    cursor:pointer;background:#fff;transition:.15s ease;
+    padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:6px;
+    cursor:pointer;background:#f1f5f9;transition:.15s ease;
   }
-  .item:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,23,42,.05)}
-  .item.active{background:#dff8fb;border-color:#99e3ea}
+  .item:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,23,42,.05);background:#e0f2fe}
+  .item.active{background:#0ea5a4;border-color:#0ea5a4;color:#fff}
+  .item.active small{color:#ecfeff}
   .item-title{font-weight:700}
   .item small{display:block;color:var(--muted);margin-top:4px;line-height:1.7}
   .viewer-head{
@@ -105,6 +168,17 @@
   .viewer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .action-btn{background:#eef2f7;color:#1f2937}
   .action-btn.primary{background:var(--soft);color:var(--primary-dark);font-weight:700}
+  .icon-only{
+    width:42px;
+    height:42px;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    border-radius:12px;
+    flex:0 0 auto;
+  }
   iframe{width:100%;height:76vh;min-height:520px;border:none;border-radius:12px;background:#fff}
   .blank{
     height:76vh;min-height:520px;border:2px dashed var(--line);border-radius:14px;
@@ -158,9 +232,12 @@
     .layout{grid-template-columns:1fr}
     .admin-grid{grid-template-columns:1fr}
     .menu-btn{display:inline-flex}
-    .top{padding:10px 12px}
-    .top-title{font-size:18px;max-width:62vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .top-left{gap:6px}
+    .top{padding:12px 12px 14px}
+    .top-row{align-items:flex-start;gap:10px}
+    .top-right{gap:8px}
+    .brand-title-wrap{gap:8px}
+    .top-title{font-size:18px;line-height:1.4;max-width:none;white-space:normal}
+    .top-left{gap:6px;flex-direction:column;align-items:flex-end}
     .sidebar{
       position:fixed;top:64px;right:0;bottom:0;width:min(90vw,360px);z-index:70;
       transform:translateX(105%);transition:.2s ease;overflow:auto;border-radius:18px 0 0 0;box-shadow:0 20px 50px rgba(2,6,23,.22)
@@ -169,17 +246,22 @@
     .tools,.desktop-only{display:none !important}
     .viewer{padding:10px}
     iframe,.blank{height:calc(100vh - 190px);min-height:420px}
-    .viewer-actions{gap:6px}
-    .viewer-actions button{padding:9px 11px;font-size:13px}
+    .viewer-actions{gap:6px;justify-content:flex-start}
+    .viewer-actions button{font-size:18px}
   }
 
   @media (max-width:520px){
-    .top-right,.top-left{gap:6px}
+    .top-right{gap:6px}
+    .top-left{gap:6px}
     .btn-white,.btn-ghost{padding:9px 11px;font-size:13px}
+    .admin-icon-btn{width:30px;height:30px;font-size:14px;border-radius:10px}
+    .brand-logo-top{width:40px;height:40px;font-size:21px}
+    .icon-btn{width:40px;height:40px;min-width:40px;font-size:19px;border-radius:14px}
     .viewer-head h2{font-size:19px}
     .viewer-head p{font-size:12px}
     .blank{padding:16px;line-height:1.9}
     .admin-item{grid-template-columns:1fr}
+    .viewer-actions{gap:8px}
   }
 </style>
 
@@ -190,15 +272,22 @@
 <body>
 
 <div class="top">
-  <div class="top-right">
-    <button class="btn-ghost icon-btn menu-btn" id="menuBtn" title="القائمة">☰</button>
-    <div class="top-title" id="siteTitleTop">بوابة ملفات المدرسة</div>
-  </div>
-  <div class="top-left">
-    <button class="btn-ghost hidden" id="toggleAdminBtn">إظهار الإدارة</button>
-    <button class="btn-ghost hidden desktop-only" id="resetBtn">إعادة ضبط</button>
-    <button class="btn-white" id="loginBtn">دخول الإدارة</button>
-    <button class="btn-ghost hidden" id="logoutBtn">خروج الإدارة</button>
+  <div class="top-row">
+    <div class="top-right">
+      <div class="brand-title-wrap">
+        <div class="top-title" id="siteTitleTop">ابتدائية ومتوسطة الراشدون بالمربع منصة الخطط والملفات المدرسية</div>
+        <div class="brand-logo-top" title="شعار المدرسة">🏫</div>
+      </div>
+      <div class="menu-inline">
+        <button class="btn-ghost icon-btn menu-btn" id="menuBtn" title="القائمة">☰</button>
+      </div>
+    </div>
+    <div class="top-left">
+      <button class="btn-ghost hidden" id="toggleAdminBtn">إظهار الإدارة</button>
+      <button class="btn-ghost hidden desktop-only" id="resetBtn">إعادة ضبط</button>
+      <button class="btn-white admin-icon-btn" id="loginBtn" title="دخول الإدارة">👤</button>
+      <button class="btn-ghost admin-icon-btn hidden" id="logoutBtn" title="خروج الإدارة">↩</button>
+    </div>
   </div>
 </div>
 
@@ -213,10 +302,19 @@
         <h3>إعدادات الموقع</h3>
         <div class="field">
           <label>عنوان الموقع</label>
-          <input id="siteTitleInput" placeholder="بوابة ملفات المدرسة">
+          <input id="siteTitleInput" placeholder="ابتدائية ومتوسطة الراشدون بالمربع منصة الخطط والملفات المدرسية">
+        </div>
+        <div class="field">
+          <label>ثيم الموقع</label>
+          <select id="themeSelect">
+            <option value="emerald">الأخضر المدرسي</option>
+            <option value="blue">الأزرق الهادئ</option>
+            <option value="purple">البنفسجي الأنيق</option>
+            <option value="sand">الرملي الكلاسيكي</option>
+          </select>
         </div>
         <div class="row">
-          <button class="btn-soft" id="saveSettingsBtn">حفظ العنوان</button>
+          <button class="btn-soft" id="saveSettingsBtn">حفظ الإعدادات</button>
           <button class="btn-muted" id="exportJsonBtn">حفظ نسخة JSON</button>
           <button class="btn-warning" id="importJsonBtn">استعادة JSON</button>
           <input type="file" id="jsonFileInput" accept="application/json" class="hidden">
@@ -285,11 +383,11 @@
       </div>
 
       <div class="viewer-actions">
-        <button class="action-btn" id="openNewBtn">فتح في نافذة جديدة</button>
-        <button class="action-btn" id="downloadBtn">تنزيل</button>
-        <button class="action-btn" id="copyLinkBtn">نسخ الرابط</button>
-        <button class="action-btn primary" id="whatsBtn">مشاركة واتساب</button>
-        <button class="action-btn" id="shareSectionBtn">مشاركة القسم</button>
+        <button class="action-btn icon-only" id="openNewBtn" title="فتح في نافذة جديدة" aria-label="فتح في نافذة جديدة">🔗</button>
+        <button class="action-btn icon-only" id="downloadBtn" title="تنزيل" aria-label="تنزيل">⬇️</button>
+        <button class="action-btn icon-only" id="copyLinkBtn" title="نسخ الرابط" aria-label="نسخ الرابط">📋</button>
+        <button class="action-btn icon-only primary" id="whatsBtn" title="مشاركة واتساب" aria-label="مشاركة واتساب">🟢</button>
+        <button class="action-btn icon-only" id="shareSectionBtn" title="مشاركة القسم" aria-label="مشاركة القسم">📤</button>
       </div>
 
       <div id="viewerArea">
@@ -348,7 +446,8 @@ let state = {
   search:"",
   openCategories:[],
   selectedItemId:null,
-  siteTitle:"بوابة ملفات المدرسة",
+  siteTitle:"ابتدائية ومتوسطة الراشدون بالمربع منصة الخطط والملفات المدرسية",
+  theme:"emerald",
   categories:[],
   items:[]
 };
@@ -369,6 +468,7 @@ function setStatus(text){
 function saveFallback(){
   localStorage.setItem(FALLBACK_STORAGE_KEY, JSON.stringify({
     siteTitle: state.siteTitle,
+    theme: state.theme || 'emerald',
     categories: state.categories,
     items: state.items
   }));
@@ -384,7 +484,8 @@ function defaultSeed(){
   const c1 = {id:uid(), name:"الخطط العامة", order:1};
   const c2 = {id:uid(), name:"روابط مهمة", order:2};
   return {
-    siteTitle:"بوابة ملفات المدرسة",
+    siteTitle:"ابتدائية ومتوسطة الراشدون بالمربع منصة الخطط والملفات المدرسية",
+  theme:"emerald",
     categories:[c1,c2],
     items:[
       {id:uid(), title:"موقع وزارة التعليم", url:"https://www.moe.gov.sa", categoryId:c2.id, note:"مثال", hidden:false, order:1},
@@ -396,13 +497,14 @@ function defaultSeed(){
 function normalizeData(data){
   const seed = defaultSeed();
   const siteTitle = (data && data.siteTitle) ? data.siteTitle : seed.siteTitle;
+  const theme = (data && data.theme) ? data.theme : (seed.theme || 'emerald');
   const categories = Array.isArray(data?.categories) && data.categories.length ? data.categories.map((c,i)=>(
     {id:c.id || uid(), name:c.name || `قسم ${i+1}`, order:Number.isFinite(c.order)?c.order:(i+1)}
   )) : seed.categories;
   const items = Array.isArray(data?.items) ? data.items.map((it,i)=>(
     {id:it.id || uid(), title:it.title || `عنصر ${i+1}`, url:it.url || "", categoryId:it.categoryId || categories[0]?.id || "", note:it.note || "", hidden:!!it.hidden, order:Number.isFinite(it.order)?it.order:(i+1)}
   )) : seed.items;
-  return {siteTitle, categories, items};
+  return {siteTitle, theme, categories, items};
 }
 
 function googlePreviewUrl(url){
@@ -452,6 +554,8 @@ function renderTop(){
   q('toggleAdminBtn').textContent = state.adminVisible ? 'إخفاء الإدارة' : 'إظهار الإدارة';
   q('adminArea').classList.toggle('show', state.isAdmin && state.adminVisible);
   q('siteTitleInput').value = state.siteTitle;
+  const themeSelect = q('themeSelect'); if(themeSelect) themeSelect.value = state.theme || 'emerald';
+  document.body.className = 'theme-' + (state.theme || 'emerald');
   fillCategorySelect();
 }
 
@@ -654,7 +758,7 @@ async function ensureSeedIfEmpty(){
 
   const seed = normalizeData(loadFallback() || defaultSeed());
   const batch = db.batch();
-  batch.set(db.collection('settings').doc('site'), {siteTitle:seed.siteTitle, updatedAt:Date.now()}, {merge:true});
+  batch.set(db.collection('settings').doc('site'), {siteTitle:seed.siteTitle, theme:seed.theme || 'emerald', updatedAt:Date.now()}, {merge:true});
   seed.categories.forEach(cat=> batch.set(db.collection('categories').doc(cat.id), cat));
   seed.items.forEach(item=> batch.set(db.collection('items').doc(item.id), item));
   await batch.commit();
@@ -667,7 +771,8 @@ function subscribeData(){
 
   unsubscribeSettings = db.collection('settings').doc('site').onSnapshot(doc=>{
     if(doc.exists){
-      state.siteTitle = doc.data().siteTitle || 'بوابة ملفات المدرسة';
+      state.siteTitle = doc.data().siteTitle || 'ابتدائية ومتوسطة الراشدون بالمربع منصة الخطط والملفات المدرسية';
+      state.theme = doc.data().theme || 'emerald';
       saveFallback();
       renderTop();
     }
@@ -675,7 +780,7 @@ function subscribeData(){
 
   unsubscribeCategories = db.collection('categories').orderBy('order').onSnapshot(snap=>{
     state.categories = snap.docs.map(d=> ({id:d.id, ...d.data()}));
-    if(!state.openCategories.length) state.openCategories = state.categories.map(c=>c.id);
+    state.openCategories = state.categories.map(c=>c.id);
     saveFallback();
     renderAll();
   }, handleFirestoreError);
@@ -693,18 +798,20 @@ function handleFirestoreError(error){
   console.error(error);
   const fallback = normalizeData(loadFallback() || defaultSeed());
   state.siteTitle = fallback.siteTitle;
+  state.theme = fallback.theme || 'emerald';
   state.categories = fallback.categories;
   state.items = fallback.items;
-  if(!state.openCategories.length) state.openCategories = state.categories.map(c=>c.id);
+  state.openCategories = state.categories.map(c=>c.id);
   setStatus('تعذر الاتصال بـ Firebase حاليًا، وتم تشغيل النسخة المحلية المؤقتة.');
   renderAll();
 }
 
 async function saveSettings(){
   const title = q('siteTitleInput').value.trim();
+  const theme = q('themeSelect').value || 'emerald';
   if(!title) return alert('اكتب عنوان الموقع');
   try{
-    await db.collection('settings').doc('site').set({siteTitle:title, updatedAt:Date.now()}, {merge:true});
+    await db.collection('settings').doc('site').set({siteTitle:title, theme, updatedAt:Date.now()}, {merge:true});
   }catch(err){
     console.error(err);
     alert('تعذر حفظ العنوان. تأكد من دخول الإدارة ومن عمل Firestore Rules.');
@@ -775,7 +882,7 @@ async function importJsonFile(file){
   if(!confirm('سيتم استبدال الأقسام والعناصر الحالية بمحتوى الملف. متابعة؟')) return;
 
   const batch = db.batch();
-  batch.set(db.collection('settings').doc('site'), {siteTitle:data.siteTitle, updatedAt:Date.now()}, {merge:true});
+  batch.set(db.collection('settings').doc('site'), {siteTitle:data.siteTitle, theme:data.theme || 'emerald', updatedAt:Date.now()}, {merge:true});
 
   const existingCats = await db.collection('categories').get();
   existingCats.docs.forEach(doc=> batch.delete(doc.ref));
@@ -895,6 +1002,7 @@ async function boot(){
 
   const fallback = normalizeData(loadFallback() || defaultSeed());
   state.siteTitle = fallback.siteTitle;
+  state.theme = fallback.theme || 'emerald';
   state.categories = fallback.categories;
   state.items = fallback.items;
   state.openCategories = state.categories.map(c=>c.id);
