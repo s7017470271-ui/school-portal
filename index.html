@@ -165,8 +165,10 @@
   }
   .viewer-head h2{margin:0;font-size:22px}
   .viewer-head p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
-  .viewer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-  .action-btn{background:#eef2f7;color:#1f2937}
+  .viewer-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .viewer-actions-group{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .viewer-actions-group.zoom-group{margin-inline-start:auto}
+  .action-btn{background:#eef2f7;color:#1f2937;touch-action:manipulation}
   .action-btn.primary{background:var(--soft);color:var(--primary-dark);font-weight:700}
   .icon-only{
     width:42px;
@@ -179,7 +181,12 @@
     border-radius:12px;
     flex:0 0 auto;
   }
-  iframe{width:100%;height:76vh;min-height:520px;border:none;border-radius:12px;background:#fff}
+  .viewer-frame-shell{border:1px solid var(--line);border-radius:14px;overflow:auto;background:#fff;height:76vh;min-height:520px;-webkit-overflow-scrolling:touch}
+  .viewer-zoom-wrap{transform-origin:top right;width:100%;transition:transform .18s ease,width .18s ease}
+  .viewer-zoom-wrap.scaled{min-width:100%}
+  iframe{width:100%;height:76vh;min-height:520px;border:none;border-radius:12px;background:#fff;display:block}
+  .zoom-indicator{font-size:12px;color:var(--muted);background:#f8fafc;border:1px solid var(--line);padding:6px 10px;border-radius:999px;min-width:58px;text-align:center}
+  .viewer-help{font-size:12px;color:var(--muted);margin:-2px 0 10px}
   .blank{
     height:76vh;min-height:520px;border:2px dashed var(--line);border-radius:14px;
     display:grid;place-items:center;color:var(--muted);background:#fbfdff;text-align:center;padding:20px;line-height:2
@@ -246,8 +253,11 @@
     .tools,.desktop-only{display:none !important}
     .viewer{padding:10px}
     iframe,.blank{height:calc(100vh - 190px);min-height:420px}
-    .viewer-actions{gap:6px;justify-content:flex-start}
+    .viewer-actions{gap:8px;justify-content:space-between;align-items:flex-start}
+    .viewer-actions-group{gap:6px}
+    .viewer-actions-group.zoom-group{margin-inline-start:0}
     .viewer-actions button{font-size:18px}
+    .zoom-indicator{min-width:52px;padding:5px 8px}
   }
 
   @media (max-width:520px){
@@ -383,12 +393,21 @@
       </div>
 
       <div class="viewer-actions">
-        <button class="action-btn icon-only" id="openNewBtn" title="فتح في نافذة جديدة" aria-label="فتح في نافذة جديدة">🔗</button>
-        <button class="action-btn icon-only" id="downloadBtn" title="تنزيل" aria-label="تنزيل">⬇️</button>
-        <button class="action-btn icon-only" id="copyLinkBtn" title="نسخ الرابط" aria-label="نسخ الرابط">📋</button>
-        <button class="action-btn icon-only primary" id="whatsBtn" title="مشاركة واتساب" aria-label="مشاركة واتساب">🟢</button>
-        <button class="action-btn icon-only" id="shareSectionBtn" title="مشاركة القسم" aria-label="مشاركة القسم">📤</button>
+        <div class="viewer-actions-group">
+          <button class="action-btn icon-only" id="openNewBtn" title="فتح في نافذة جديدة" aria-label="فتح في نافذة جديدة">🔗</button>
+          <button class="action-btn icon-only" id="downloadBtn" title="تنزيل" aria-label="تنزيل">⬇️</button>
+          <button class="action-btn icon-only" id="copyLinkBtn" title="نسخ الرابط" aria-label="نسخ الرابط">📋</button>
+          <button class="action-btn icon-only primary" id="whatsBtn" title="مشاركة واتساب" aria-label="مشاركة واتساب">🟢</button>
+          <button class="action-btn icon-only" id="shareSectionBtn" title="مشاركة القسم" aria-label="مشاركة القسم">📤</button>
+        </div>
+        <div class="viewer-actions-group zoom-group">
+          <button class="action-btn icon-only" id="zoomOutBtn" title="تصغير" aria-label="تصغير">－</button>
+          <div class="zoom-indicator" id="zoomIndicator">100%</div>
+          <button class="action-btn icon-only" id="zoomInBtn" title="تكبير" aria-label="تكبير">＋</button>
+          <button class="action-btn icon-only" id="zoomResetBtn" title="إرجاع الحجم" aria-label="إرجاع الحجم">⟲</button>
+        </div>
       </div>
+      <div class="viewer-help" id="viewerHelp">في الجوال يمكنك أيضًا استخدام أصابعك للتكبير داخل بعض الملفات، ومع الأزرار هنا لتكبير العارض نفسه.</div>
 
       <div id="viewerArea">
         <div class="blank">ابدأ باختيار قسم، ثم اختر عنصرًا من تحته ليظهر هنا بالحجم الكامل داخل الصفحة.</div>
@@ -449,7 +468,8 @@ let state = {
   siteTitle:"ابتدائية ومتوسطة الراشدون بالمربع منصة الخطط والملفات المدرسية",
   theme:"emerald",
   categories:[],
-  items:[]
+  items:[],
+  viewerScale:1
 };
 
 function q(id){ return document.getElementById(id); }
@@ -619,13 +639,37 @@ function renderCategories(){
   });
 }
 
+function updateViewerZoom(){
+  const indicator = q('zoomIndicator');
+  if(indicator) indicator.textContent = Math.round((state.viewerScale || 1) * 100) + '%';
+  const wrap = document.querySelector('.viewer-zoom-wrap');
+  if(!wrap) return;
+  const scale = state.viewerScale || 1;
+  wrap.style.transform = `scale(${scale})`;
+  wrap.style.width = `${100/scale}%`;
+  wrap.classList.toggle('scaled', scale !== 1);
+}
+
+function changeViewerZoom(delta){
+  state.viewerScale = Math.max(0.7, Math.min(2, Math.round(((state.viewerScale || 1) + delta) * 100) / 100));
+  updateViewerZoom();
+}
+
+function resetViewerZoom(){
+  state.viewerScale = 1;
+  updateViewerZoom();
+}
+
 function clearViewer(){
   state.selectedItemId = null;
   q('viewerTitle').textContent = 'مرحبًا بك';
   q('viewerMeta').textContent = 'اختر قسمًا ثم اختر الملف المطلوب.';
   q('viewerType').textContent = 'معاينة';
   q('viewerArea').innerHTML = `<div class="blank">ابدأ باختيار قسم، ثم اختر عنصرًا من تحته ليظهر هنا بالحجم الكامل داخل الصفحة.</div>`;
+  resetViewerZoom();
+  updateActionButtons();
 }
+
 
 function showItem(id){
   const item = state.items.find(x=>x.id===id);
@@ -634,15 +678,19 @@ function showItem(id){
   q('viewerTitle').textContent = item.title;
   q('viewerMeta').textContent = `${categoryName(item.categoryId)}${item.note ? ' · ' + item.note : ''}`;
   q('viewerType').textContent = getTypeLabel(item.url);
-  q('viewerArea').innerHTML = `<iframe src="${escapeHtml(googlePreviewUrl(item.url))}" referrerpolicy="no-referrer"></iframe>`;
+  q('viewerArea').innerHTML = `<div class="viewer-frame-shell"><div class="viewer-zoom-wrap"><iframe src="${escapeHtml(googlePreviewUrl(item.url))}" referrerpolicy="no-referrer"></iframe></div></div>`;
+  resetViewerZoom();
   renderCategories();
+  updateActionButtons();
   if(isMobile()) closeSidebar();
 }
 
 function updateActionButtons(){
   const has = !!currentItem();
-  ['openNewBtn','downloadBtn','copyLinkBtn','whatsBtn','shareSectionBtn'].forEach(id=> q(id).disabled = !has);
+  ['openNewBtn','downloadBtn','copyLinkBtn','whatsBtn','shareSectionBtn','zoomOutBtn','zoomInBtn','zoomResetBtn'].forEach(id=> q(id).disabled = !has);
+  if(!has) resetViewerZoom();
 }
+
 
 function fillCategorySelect(){
   const cats = [...state.categories].sort((a,b)=>(a.order||0)-(b.order||0));
@@ -896,13 +944,35 @@ async function importJsonFile(file){
 }
 
 function copyText(text){
-  navigator.clipboard.writeText(text).then(()=> alert('تم نسخ الرابط')).catch(()=> alert('تعذر النسخ تلقائيًا'));
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=> alert('تم نسخ الرابط')).catch(()=> fallbackCopyText(text));
+    return;
+  }
+  fallbackCopyText(text);
+}
+
+function fallbackCopyText(text){
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.style.position = 'fixed';
+  area.style.opacity = '0';
+  document.body.appendChild(area);
+  area.focus();
+  area.select();
+  try{
+    document.execCommand('copy');
+    alert('تم نسخ الرابط');
+  }catch(err){
+    prompt('انسخ الرابط يدويًا', text);
+  }
+  area.remove();
 }
 
 function openCurrentNew(){
   const item = currentItem();
   if(!item) return;
-  window.open(item.url, '_blank');
+  const w = window.open(item.url, '_blank', 'noopener');
+  if(!w) location.href = item.url;
 }
 
 function downloadCurrent(){
@@ -912,6 +982,7 @@ function downloadCurrent(){
   a.href = item.url;
   a.target = '_blank';
   a.rel = 'noopener';
+  a.setAttribute('download', '');
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -990,6 +1061,9 @@ function bindEvents(){
   q('copyLinkBtn').onclick = copyCurrentLink;
   q('whatsBtn').onclick = shareWhats;
   q('shareSectionBtn').onclick = shareSection;
+  q('zoomInBtn').onclick = ()=> changeViewerZoom(0.1);
+  q('zoomOutBtn').onclick = ()=> changeViewerZoom(-0.1);
+  q('zoomResetBtn').onclick = resetViewerZoom;
 
   window.addEventListener('resize', ()=>{
     if(!isMobile()) closeSidebar();
